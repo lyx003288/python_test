@@ -1,0 +1,15 @@
+*~
+_Store
+ebin
+*.beam
+.eunit
+.rebar
+*.swp
+deps
+*.dump
+log
+.DS_Store
+rel/ptnature_app_config
+erl_crash.dump
+*.iml
+.idea/
