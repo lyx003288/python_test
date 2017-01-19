@@ -11,11 +11,10 @@ from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 from tornado.options import options, define
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 def handle_msg( session_id, msg ):
-    logger.info("handle message: user_id=%d, msg=%s", session_id, msg)
-    GameServer().send_msg(session_id, "[{}]: this is server back msg {}".format(session_id, msg))
+    GameServer().send_msg(session_id, "server send: {}".format(msg))
 
 @singleton
 class GameServer(TCPServer):
@@ -30,7 +29,7 @@ class GameServer(TCPServer):
             next_session_id = next(self.session_id)
             self.m_stream_dict[stream] = next_session_id
             self.m_session_dict[next_session_id] = stream
-            logger.info("[%d] new connect", next_session_id)
+            logging.info("[%d] new connect", next_session_id)
             return next_session_id
 
     def _on_disconnect(self, session_id):
@@ -39,15 +38,15 @@ class GameServer(TCPServer):
             del self.m_session_dict[session_id]
             del self.m_stream_dict[stream]
         else:
-            logger.error("_on_disconnect error")
+            logging.error("_on_disconnect error")
 
     @gen.coroutine
     def send_msg(self, session_id, msg):
         if(session_id in self.m_session_dict):
             yield self.m_session_dict[session_id].write(msg)
-            logger.info("[%d] send msg: %s", session_id, msg)
+            logging.info("[%d] send msg: %s", session_id, msg)
         else:
-            logger.error("[%d] send msg error, msg: %s", session_id, msg)
+            logging.error("[%d] send msg error, msg: %s", session_id, msg)
 
     @gen.coroutine
     def close(self, session_id, code=1, reason="normal"):
@@ -56,7 +55,7 @@ class GameServer(TCPServer):
             yield stream.write("[{}] close, code = {}, reason = {}\n".format(session_id, code, reason))
             yield stream.close()
         else:
-            logger.error("[%d] connect close error, code = %d, reason = %s", session_id, code, reason)
+            logging.error("[%d] connect close error, code = %d, reason = %s", session_id, code, reason)
 
     @gen.coroutine
     def handle_stream(self, stream, address):
@@ -68,7 +67,7 @@ class GameServer(TCPServer):
                 handle_msg(session_id, data)
             except StreamClosedError:
                 self._on_disconnect(session_id)
-                logger.warning("[%d] disconnect at host %s, port %d", session_id, address[0], address[1] )
+                logging.warning("[%d] disconnect at host %s, port %d", session_id, address[0], address[1] )
                 break
             except Exception as e:
                 print(e)
@@ -80,7 +79,7 @@ class call_later_callback(object):
 
     def heartbeat(self):
         if(next(self.counter) % 60 == 0):
-            print("time:%s " % time.strftime('%m-%d %H:%M:%S', time.localtime()))
+            logging.info("time:%s " % time.strftime('%m-%d %H:%M:%S', time.localtime()))
         IOLoop.current().call_later(1, self.heartbeat)
 
 def start(port=8899):
@@ -88,6 +87,6 @@ def start(port=8899):
     options.parse_command_line()
     server = GameServer()
     server.listen(options.port)
-    logger.info("Listening on TCP port %d", options.port)
+    logging.info("Listening on TCP port %d", options.port)
     IOLoop.current().call_later(1, call_later_callback().heartbeat)
     IOLoop.current().start()

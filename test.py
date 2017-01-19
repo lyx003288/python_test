@@ -2,6 +2,7 @@
 #-*- coding: UTF-8 -*-
 
 from __future__ import print_function
+import util
 
 #  练习1
 # 1 2 3 4 组成没有重复数字的三位数
@@ -348,7 +349,6 @@ def pcall( fn, n ):
     s = fn(n)
     return s
 
-import logging
 from tornado.ioloop import IOLoop
 from tornado import gen
 from tornado.iostream import StreamClosedError
@@ -436,8 +436,27 @@ class F(E, D):
 def h():
     F()
 
+import logging
+
 if(__name__ == "__main__"):
-    print('running over')
+    util.init_log_config("log/example.log")
+
+    ret = hasattr(F, 'static_test')
+
+    for i in range(10):
+        logging.debug('This is debug message')
+        logging.info('This is info message')
+        logging.warning('This is warning message')
+        logging.error('This is error message')
+        logging.critical('This is critical message')
+
+    # logging.basicConfig(
+    #     filename='log/example.log',
+    #     filemode='w',
+    #     level=logging.DEBUG,
+    #     format='%(asctime)s %(levelname)s: %(message)s',
+    #     datefmt='[%m/%d %H:%M:%S]')
+
     # import time
     # time.sleep(10)
     # print("fffffffffffffff")
