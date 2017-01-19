@@ -58,4 +58,4 @@ def start_http_server( ip, port ):
 
 if(__name__ == "__main__"):
     # 测试指令: curl -H "Content-type: application/json;charset=UTF-8"  localhost:8899 -d "{\"key\":\"value\"}"
-    start_http_server( "localhost", 8899 )
+    start_http_server( "localhost", 8890 )

@@ -8,6 +8,8 @@ import time
 import datetime
 import ftplib
 import tarfile
+import httplib
+import json
 
 def generate_file_name(day_str):
     year = int(day_str[0:4])
@@ -85,7 +87,15 @@ def ftp_upload(files):
     return status
 
 def upload_callback(file):
-    pass
+    post_params = json.dumps({"file_name": file})
+    headers = {'Content-type': 'application/json;charset=UTF-8'}
+    http_client = httplib.HTTPConnection("127.0.0.1", 8890, timeout=5)
+    http_client.request("POST", "", post_params, headers)
+    response = http_client.getresponse()
+    print("head: %s" % response.getheaders())
+    print("status: %s, reason: %s" % (response.status, response.reason))
+    content = response.read()
+    logging.info("upload_callback resp %s", content)
 
 def upload_between_date(start_date, end_date):
     date_begin = datetime.date(int(start_date[0:4]), int(start_date[5:7]), int(start_date[8:10]))
@@ -106,7 +116,7 @@ def which_date(argv):
         end_date = start_date
     elif(argv_len == 1):
         start_date = argv[0]
-        end_date = time.strftime("%Y-%m-%d", time.localtime())
+        end_date = start_date
     elif(argv_len == 2):
         start_date = argv[0]
         end_date = argv[1]
