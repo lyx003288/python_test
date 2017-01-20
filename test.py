@@ -2,7 +2,10 @@
 #-*- coding: UTF-8 -*-
 
 from __future__ import print_function
+import logging
 import util
+import sys
+import threading
 
 #  练习1
 # 1 2 3 4 组成没有重复数字的三位数
@@ -436,39 +439,17 @@ class F(E, D):
 def h():
     F()
 
-import logging
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+sys.excepthook = util.my_excepthook
 
 if(__name__ == "__main__"):
-    util.init_log_config("log/example.log")
+    util.init_log_config()
 
-    ret = hasattr(F, 'static_test')
+    import tcp_server
+    tcp_server.start(8899)
 
-    for i in range(10):
-        logging.debug('This is debug message')
-        logging.info('This is info message')
-        logging.warning('This is warning message')
-        logging.error('This is error message')
-        logging.critical('This is critical message')
-
-    # logging.basicConfig(
-    #     filename='log/example.log',
-    #     filemode='w',
-    #     level=logging.DEBUG,
-    #     format='%(asctime)s %(levelname)s: %(message)s',
-    #     datefmt='[%m/%d %H:%M:%S]')
-
-    # import time
-    # time.sleep(10)
-    # print("fffffffffffffff")
-
-    # import tcp_server
-    # tcp_server.start(8899)
-    # options.parse_command_line()
-    # server = EchoServer()
-    # server.listen(options.port)
-    # logger.info("Listening on TCP port %d", options.port)
-    # IOLoop.current().start()
-    # print("start .................")
 
 
 

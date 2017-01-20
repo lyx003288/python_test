@@ -11,8 +11,6 @@ from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 from tornado.options import options, define
 
-# logger = logging.getLogger(__name__)
-
 def handle_msg( session_id, msg ):
     GameServer().send_msg(session_id, "server send: {}".format(msg))
 
@@ -70,7 +68,7 @@ class GameServer(TCPServer):
                 logging.warning("[%d] disconnect at host %s, port %d", session_id, address[0], address[1] )
                 break
             except Exception as e:
-                print(e)
+                logging.error(e)
 
 @singleton
 class call_later_callback(object):

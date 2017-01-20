@@ -2,8 +2,8 @@
 import logging
 import logging.handlers
 
-def init_log_config(log_file):
-    logging.basicConfig(#filename=log_file,
+def init_log_config():
+    logging.basicConfig(#filename="log/info.log",
                         # filemode='w',
                         level=logging.DEBUG,
                         format='%(asctime)s [%(filename)s %(funcName)s %(lineno)d] %(levelname)s: %(message)s',
@@ -12,18 +12,24 @@ def init_log_config(log_file):
     #################################################################################################
     formatter = logging.Formatter('%(asctime)s [%(filename)s %(funcName)s %(lineno)d] %(levelname)s: %(message)s')
 
-
-    # 定义一个StreamHandler，将INFO级别或更高的日志信息打印到标准错误，并将其添加到当前的日志处理对象#
+    # 定义一个StreamHandler，将INFO级别或更高的日志信息打印到标准错误，并将其添加到当前的日志处理对象
     # console = logging.StreamHandler()
     # console.setLevel(logging.INFO)
     # console.setFormatter(formatter)
     # logging.getLogger().addHandler(console)
 
-    rotating = logging.handlers.RotatingFileHandler(log_file, maxBytes=1024*1024*10, backupCount=3, delay=True)
-    rotating.setLevel(logging.DEBUG)
+    rotating = logging.handlers.RotatingFileHandler("log/info.log", maxBytes=1024*1024*10, backupCount=3, delay=True)
+    rotating.setLevel(logging.DEBUG)    # todo 正式环境设置为INFO级别
     rotating.setFormatter(formatter)
     logging.getLogger().addHandler(rotating)
 
+    error_rotating = logging.handlers.RotatingFileHandler("log/error.log", maxBytes=1024*1024*10, backupCount=3, delay=True)
+    error_rotating.setLevel(logging.WARNING)
+    error_rotating.setFormatter(formatter)
+    logging.getLogger().addHandler(error_rotating)
+
+def my_excepthook(excType, excValue, traceback):
+    logging.error("Uncaught Exception", exc_info=(excType, excValue, traceback))
 
 class StringNumberParse(object):
     '''
@@ -61,7 +67,7 @@ class StringNumberParse(object):
         self.clear()
         decode_str = utf8_string.decode("utf-8")
         for char in decode_str:
-            print ("char=%s, char_ascii=%d, unicode=%s" % ( char, ord(char), char.encode('unicode_escape')))
+            logging.debug("char=%s, char_ascii=%d, unicode=%s" % ( char, ord(char), char.encode('unicode_escape')))
             if(char >= u'\u4e00') and (char <= u'\u9fa5'):
                 self.chinese_number = self.chinese_number + 1
             elif(char.isalpha()):
