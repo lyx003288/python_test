@@ -4,7 +4,7 @@
 import itertools
 import time
 import logging
-from util import singleton
+from myutil import singleton
 from tornado.ioloop import IOLoop
 from tornado import gen
 from tornado.iostream import StreamClosedError

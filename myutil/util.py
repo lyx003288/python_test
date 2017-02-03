@@ -79,3 +79,6 @@ class StringNumberParse(object):
 
     def clear(self):
         self.init()
+
+def airy():
+    print('util.test')
