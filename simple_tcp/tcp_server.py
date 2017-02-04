@@ -4,7 +4,8 @@
 import itertools
 import time
 import logging
-from myutil import singleton
+from myutil.singleton import singleton
+from myutil.singleton import Singleton
 from tornado.ioloop import IOLoop
 from tornado import gen
 from tornado.iostream import StreamClosedError
@@ -14,10 +15,9 @@ from tornado.options import options, define
 def handle_msg( session_id, msg ):
     GameServer().send_msg(session_id, "server send: {}".format(msg))
 
-@singleton
-class GameServer(TCPServer):
+class GameServer(Singleton, TCPServer):
     def __init__(self):
-        TCPServer.__init__(self)
+        super(GameServer, self).__init__()
         self.session_id = itertools.count(1)
         self.m_stream_dict = {}
         self.m_session_dict = {}
