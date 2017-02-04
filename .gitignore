@@ -13,3 +13,4 @@ rel/ptnature_app_config
 erl_crash.dump
 *.iml
 .idea/
+__pycache__
