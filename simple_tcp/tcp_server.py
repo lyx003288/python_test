@@ -11,13 +11,16 @@ from tornado import gen
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
 from tornado.options import options, define
+import tornado.web
 
 def handle_msg( session_id, msg ):
     GameServer().send_msg(session_id, "server send: {}".format(msg))
 
-class GameServer(Singleton, TCPServer):
+@singleton
+class GameServer(TCPServer):
     def __init__(self):
-        super(GameServer, self).__init__()
+        # super(GameServer, self).__init__()
+        TCPServer.__init__(self)
         self.session_id = itertools.count(1)
         self.m_stream_dict = {}
         self.m_session_dict = {}
@@ -41,7 +44,7 @@ class GameServer(Singleton, TCPServer):
     @gen.coroutine
     def send_msg(self, session_id, msg):
         if(session_id in self.m_session_dict):
-            yield self.m_session_dict[session_id].write(msg)
+            yield self.m_session_dict[session_id].write(msg.encode("utf-8"))
             logging.info("[%d] send msg: %s", session_id, msg)
         else:
             logging.error("[%d] send msg error, msg: %s", session_id, msg)
@@ -61,14 +64,18 @@ class GameServer(Singleton, TCPServer):
         while True:
             try:
                 data = yield stream.read_until(b"\n")
+                data_utf8 = data.decode("utf-8")
+                logging.info("[%d] recv msg: %s" % (session_id, data_utf8))
                 # data = yield stream.read_bytes(read_len)
-                handle_msg(session_id, data)
+                handle_msg(session_id, data_utf8)
             except StreamClosedError:
                 self._on_disconnect(session_id)
                 logging.warning("[%d] disconnect at host %s, port %d", session_id, address[0], address[1] )
                 break
             except Exception as e:
                 logging.error(e)
+            finally:
+                pass
 
 @singleton
 class call_later_callback(object):
@@ -80,11 +87,28 @@ class call_later_callback(object):
             logging.info("time:%s " % time.strftime('%m-%d %H:%M:%S', time.localtime()))
         IOLoop.current().call_later(1, self.heartbeat)
 
-def start(port=8899):
-    define("port", default=port, help="TCP port to listen on")
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write("GET: Hello, world")
+
+    def post(self, *args, **kwargs):
+        self.write("POST: Hello world")
+
+def start(*, tcp_port=8899, web_port=8888):
+    define("tcp_port", default=tcp_port, help="Tcp port to listen on")
+    define("web_port", default=web_port, help="Web port to listen on")
     options.parse_command_line()
+
     server = GameServer()
-    server.listen(options.port)
-    logging.info("Listening on TCP port %d", options.port)
-    IOLoop.current().call_later(1, call_later_callback().heartbeat)
+    server.listen(options.tcp_port)
+    server.listen(8800)
+    logging.info("Listening on TCP port %d", options.tcp_port)
+
+    application = tornado.web.Application([
+        (r"/", MainHandler),
+    ])
+    application.listen(options.web_port)
+    logging.info("Listening on Web port %d", options.web_port)
+
+    # IOLoop.current().call_later(1, call_later_callback().heartbeat)
     IOLoop.current().start()

@@ -6,11 +6,13 @@
 '''
 
 # 使用装饰器(decorator),这是一种更pythonic,更elegant的方法
-def singleton(cls, *args, **kw):
+def singleton(cls):
     instances = {}
-    def _singleton():
+    from functools import wraps
+    @wraps(cls)
+    def _singleton(*args, **kwargs):
         if cls not in instances:
-            instances[cls] = cls(*args, **kw)
+            instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return _singleton
 
