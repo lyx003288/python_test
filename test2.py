@@ -3,7 +3,8 @@ import sys
 from multiprocessing import Pool
 # import time
 # from concurrent import futures
-
+import test4
+print("test2 run")
 
 class MyLocker:
     def __init__(self):
@@ -61,19 +62,7 @@ def test(value):
 
 
 if __name__ == '__main__':
-    L = [1, 3, 5, 7, 9, 8, 6, 4, 2]
-    D = list()
-    # with futures.ProcessPoolExecutor() as pool:
-    #     for ret in pool.map(test, L):
-    #         D.append(ret)
+    print("test2")
 
-    try:
-        pool = Pool(5)
-        D = pool.map(test, L)
-        command = "Value=%s, Pid=%s, ret=%s" % (sys.argv[1], 123, D)
-        print(command)
-    except Exception as e:
-        print(e)
-    finally:
-        pool.close()
-        pool.join()
+
+

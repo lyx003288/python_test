@@ -41,10 +41,11 @@ class GameServer(TCPServer):
         else:
             logging.error("_on_disconnect error")
 
-    @gen.coroutine
+    # @gen.coroutine
     def send_msg(self, session_id, msg):
         if(session_id in self.m_session_dict):
-            yield self.m_session_dict[session_id].write(msg.encode("utf-8"))
+            # yield self.m_session_dict[session_id].write(msg.encode("utf-8"))
+            self.m_session_dict[session_id].write(msg.encode("utf-8"))
             logging.info("[%d] send msg: %s", session_id, msg)
         else:
             logging.error("[%d] send msg error, msg: %s", session_id, msg)
@@ -112,3 +113,6 @@ def start(*, tcp_port=8899, web_port=8888):
 
     # IOLoop.current().call_later(1, call_later_callback().heartbeat)
     IOLoop.current().start()
+
+
+
